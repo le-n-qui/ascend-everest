@@ -17,9 +17,8 @@ class Node(object):
 		pass
 		
 	def print_node_info(self):
-		print("X: ", self.x_pos)
-		print("Y: ", self.y_pos)
-		print("Z: ", self.elevation)
+		print("({}, {}, {})".format(self.x_pos, self.y_pos, self.elevation))
+		
 
 
 
