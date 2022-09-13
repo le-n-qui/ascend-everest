@@ -58,37 +58,40 @@ with open(test_file) as file:
 # create a graph represented by adjacency list of nodes
 num_rows = len(seq_list)
 for row in range(num_rows):
+	
 	num_cols = len(seq_list[row])
+	
 	for col in range(num_cols):
 		neighbors = []
-		if row - 1 >= 0 and col <= (len(seq_list[row-1]) - 1) : # northern neighbor
-			neigbors.append(seq_list[row-1][col])
+		print(col, end=' ')
+		if row - 1 >= 0 and col <= (len(seq_list[row-1]) - 1): # northern neighbor
+			neighbors.append(seq_list[row-1][col])
 
-		if row - 1 >= 0 and col - 1 <= (len(seq_list[row-1]) - 1) : # north west
-			# TODO
-			pass
+		if row - 1 >= 0 and col - 1 >= 0 and col - 1 <= (len(seq_list[row-1]) - 1): # north west
+			neighbors.append(seq_list[row-1][col-1])
+
+		if row - 1 >= 0 and col + 1 <= (len(seq_list[row-1]) - 1): # north east
+			neighbors.append(seq_list[row-1][col+1])
 
 		if row + 1 < num_rows and col <= (len(seq_list[row+1]) - 1): # southern neighbor
-			neigbors.append(seq_list[row+1][col])
+			neighbors.append(seq_list[row+1][col])
+
+		if row + 1 < num_rows and col - 1 >= 0 and col - 1 <= (len(seq_list[row+1]) - 1): # south west
+			neighbors.append(seq_list[row+1][col-1])
+
+		if row + 1 < num_rows and col + 1 <= (len(seq_list[row+1]) - 1): # south east
+			neighbors.append(seq_list[row+1][col+1])
 
 		if col - 1 >= 0: # western neighbor
-			# TODO
-			pass
+			neighbors.append(seq_list[row][col-1])
 
 		if col + 1 < num_cols: # eastern neighbor
-			# TODO
-			pass
+			neighbors.append(seq_list[row][col+1])
 
+		graph_map[seq_list[row][col]] = neighbors
 
-	print()
-
+	
+	
 # print the map using the saved list of lists
 for seq in guide_map:
 	print("".join(seq), end='')
-
-# Test
-# print("\nTesting Area")
-# explorer_node.print_node_info()
-# summit_node.print_node_info()
-# print("End testing")
-
