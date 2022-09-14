@@ -7,8 +7,10 @@ from Node import Node
 
 # retrieve file name
 test_file = sys.argv[1]
+
 # retrieve heuristic function
-heuristic = sys.argv[2]
+# cast a text-based number into integer
+heuristic = int(sys.argv[2]) 
 
 # a mapping 
 elevation = {'~': 0, '.': 1, ':': 2, 'M': 3, 'S': 4}
@@ -65,7 +67,7 @@ for row in range(num_rows):
 	
 	for col in range(num_cols):
 		neighbors = []
-		print(col, end=' ')
+		
 		if row - 1 >= 0 and col <= (len(seq_list[row-1]) - 1): # northern neighbor
 			neighbors.append(seq_list[row-1][col])
 
@@ -111,7 +113,7 @@ PREVIOUS = 2
 def heuristic_function_0(explorer, summit):
 	delta_x = explorer.get_x_pos() - summit.get_x_pos()
 	delta_y = explorer.get_y_pos() - summit.get_y_pos()
-	delta_z = explorer.get_x_pos() - summit.get_z_pos()
+	delta_z = explorer.get_z_pos() - summit.get_z_pos()
 
 	return math.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
 
@@ -126,25 +128,33 @@ def heuristic_function_2(explorer, summit):
 	pass
 
 def get_heuristic(current_node, target_node):
-    f_score_value = None
+	h_score_value = None
 
-    if heuristic == 0:
-        f_score_value = heuristic_function_0(current_node, target_node)
-    elif heuristic == 1:
-        f_score_value = heuristic_function_1(current_node, target_node)
-    else:
-        f_score_value = heuristic_function_2(current_node, target_node)
+	if heuristic == 0:
+		#print("Use heuristic ZERO")
+		h_score_value = heuristic_function_0(current_node, target_node)
+	elif heuristic == 1:
+		#print("Use heuristic ONE")
+		h_score_value = heuristic_function_1(current_node, target_node)
+	else:
+		#print("Use heuristic TWO")
+		h_score_value = heuristic_function_2(current_node, target_node)
 
-    return f_score_value
+	return h_score_value
 
+# Return the node with the lowest f score
 def get_minimum(dict_unvisited_nodes):
 	minimum_f_score = sys.maxsize
+	node_lowest_fscore = None
 
 	for node in dict_unvisited_nodes:
+		#node.print_node_info()
+		#print(dict_unvisited_nodes[node][F_SCORE])
 		if dict_unvisited_nodes[node][F_SCORE] < minimum_f_score:
 			minimum_f_score = dict_unvisited_nodes[node][F_SCORE]
+			node_lowest_fscore = node
 
-	return minimum_f_score
+	return node_lowest_fscore
 
 # Search function with A* algorithm implementation
 def a_star_search(graph, start_node, target_node):
@@ -159,49 +169,56 @@ def a_star_search(graph, start_node, target_node):
 		unvisited[node] = [sys.maxsize, sys.maxsize, None]
 
 	# Update the values for the start node in the unvisited list 
-    f_score_value = get_heuristic(start_node, target_node)
+	f_score_value = get_heuristic(start_node, target_node)
 
-    unvisited[start_node] = [0, f_score_value, None]
+	unvisited[start_node] = [0, f_score_value, None]
 
     # Loop until the unvisited list becomes empty
-    done = False
+	done = False
 
-    while not done:
+	while not done:
     	# Verify if there are nodes in unvisited list
-    	if len(unvisited) == 0:
-    		done = True
-    	else:
+		if len(unvisited) == 0:
+			done = True
+		else:
     		# Get the unvisited node with the lowest f score value
-    		current_node = get_minimum(unvisited)
+			current_node = get_minimum(unvisited)
 
     		# Check if current node is the target node
-    		if current_node == target_node:
-    			done = True
-    			visited[current_node] = unvisited[current_node]
-    		else:
+			if current_node == target_node:
+				done = True
+				visited[current_node] = unvisited[current_node]
+			else:
     			# Get the list of current node's neighbors
-    			neighbors = graph_map[current_node]
+				neighbors = graph_map[current_node]
 
     			# Loop through each node in neighbors list
-    			for neighbor in neighbors:
+				for neighbor in neighbors:
     				# Check if the neighbor node has already been visited
-    				if neighbor not in visited:
+					if neighbor not in visited:
     					# Calculate new c score
-    					new_c_score = unvisited[current_node][C_SCORE] + 1
+						new_c_score = unvisited[current_node][C_SCORE] + 1
 
-    					if new_c_score < unvisited[neighbor][C_SCORE]:
+						if new_c_score < unvisited[neighbor][C_SCORE]:
     						# Update c, f, and previous node for neighbor
-    						unvisited[neighbor][C_SCORE] = new_c_score
-    						unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
-    						unvisited[neighbor][PREVIOUS] = current_node
+							unvisited[neighbor][C_SCORE] = new_c_score
+							unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
+							unvisited[neighbor][PREVIOUS] = current_node
 
     			# Add current node to the visited list
-    			visited[current_node] = unvisited[current_node]
+				visited[current_node] = unvisited[current_node]
 
     			# Remove current node from the unvisited list
-    			del unvisited[current_node]
+				del unvisited[current_node]
 
     # TODO: return the final visited list
+	return visited
+
+
+# Test
+result_map = a_star_search(graph_map, explorer_node, summit_node)
+for node in result_map:
+	node.print_node_info()
     
 
    
