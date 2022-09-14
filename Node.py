@@ -8,13 +8,13 @@ class Node(object):
 		self.elevation = z
 
 	def get_x_pos(self):
-		pass
+		return self.x_pos
 
 	def get_y_pos(self):
-		pass
+		return self.y_pos
 
 	def get_z_pos(self):
-		pass
+		return self.elevation
 		
 	def print_node_info(self):
 		print("({}, {}, {})".format(self.x_pos, self.y_pos, self.elevation))
