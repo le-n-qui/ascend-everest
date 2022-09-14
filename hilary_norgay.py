@@ -1,5 +1,6 @@
 # import libraries
 import glob
+import heapq
 import math
 import sys
 
@@ -143,15 +144,16 @@ def get_heuristic(current_node, target_node):
 	return h_score_value
 
 # Return the node with the lowest f score
-def get_minimum(dict_unvisited_nodes):
+# Implementation can be done with priority queue
+def get_minimum(dict_unvisited_neighbors): # dict of neighboring nodes
 	minimum_f_score = sys.maxsize
 	node_lowest_fscore = None
 
-	for node in dict_unvisited_nodes:
+	for node in dict_unvisited_neighbors:
 		#node.print_node_info()
 		#print(dict_unvisited_nodes[node][F_SCORE])
-		if dict_unvisited_nodes[node][F_SCORE] < minimum_f_score:
-			minimum_f_score = dict_unvisited_nodes[node][F_SCORE]
+		if dict_unvisited_neighbors[node][F_SCORE] < minimum_f_score:
+			minimum_f_score = dict_unvisited_neighbors[node][F_SCORE]
 			node_lowest_fscore = node
 
 	return node_lowest_fscore
@@ -173,6 +175,8 @@ def a_star_search(graph, start_node, target_node):
 
 	unvisited[start_node] = [0, f_score_value, None]
 
+	current_node = start_node
+
     # Loop until the unvisited list becomes empty
 	done = False
 
@@ -181,9 +185,9 @@ def a_star_search(graph, start_node, target_node):
 		if len(unvisited) == 0:
 			done = True
 		else:
-    		# Get the unvisited node with the lowest f score value
-			current_node = get_minimum(unvisited)
-
+    		# Create a local dict to store unvisited neighbor nodes	
+			unvisited_neighbors = {} 
+			
     		# Check if current node is the target node
 			if current_node == target_node:
 				done = True
@@ -204,12 +208,17 @@ def a_star_search(graph, start_node, target_node):
 							unvisited[neighbor][C_SCORE] = new_c_score
 							unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
 							unvisited[neighbor][PREVIOUS] = current_node
+							# save all unvistied neighbors in this local dict copy
+							unvisited_neighbors[neighbor] = unvisited[neighbor] 
 
     			# Add current node to the visited list
 				visited[current_node] = unvisited[current_node]
 
     			# Remove current node from the unvisited list
 				del unvisited[current_node]
+
+				# Get the unvisited node with the lowest f score value
+				current_node = get_minimum(unvisited_neighbors) 
 
     # TODO: return the final visited list
 	return visited
