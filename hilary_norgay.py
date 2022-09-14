@@ -110,7 +110,7 @@ C_SCORE = 0
 F_SCORE = 1
 PREVIOUS = 2
 
-
+# Euclidean heuristic function
 def heuristic_function_0(explorer, summit):
 	delta_x = explorer.get_x_pos() - summit.get_x_pos()
 	delta_y = explorer.get_y_pos() - summit.get_y_pos()
@@ -118,51 +118,41 @@ def heuristic_function_0(explorer, summit):
 
 	return math.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
 
+# Manhattan heuristic function
 def heuristic_function_1(explorer, summit):
-	# Manhattan distance
 	delta_x = explorer.get_x_pos() - summit.get_x_pos()
 	delta_y = explorer.get_y_pos() - summit.get_y_pos()
 
 	return math.sqrt(delta_x**2 + delta_y**2) 
 
+# Diagonal heuristic function
 def heuristic_function_2(explorer, summit):
 	pass
 
+# Retrieve the right heuristic function
+# based on the given argument on the 
+# command line terminal
 def get_heuristic(current_node, target_node):
 	h_score_value = None
 
 	if heuristic == 0:
-		#print("Use heuristic ZERO")
+		# Use heuristic 0
 		h_score_value = heuristic_function_0(current_node, target_node)
 	elif heuristic == 1:
-		#print("Use heuristic ONE")
+		# Use heuristic 1
 		h_score_value = heuristic_function_1(current_node, target_node)
 	else:
-		#print("Use heuristic TWO")
+		# Otherwise, use heuristic 2
 		h_score_value = heuristic_function_2(current_node, target_node)
 
 	return h_score_value
 
-# Return the node with the lowest f score
-# Implementation can be done with priority queue
-def get_minimum(dict_unvisited_neighbors): # dict of neighboring nodes
-	minimum_f_score = sys.maxsize
-	node_lowest_fscore = None
-
-	for node in dict_unvisited_neighbors:
-		#node.print_node_info()
-		#print(dict_unvisited_nodes[node][F_SCORE])
-		if dict_unvisited_neighbors[node][F_SCORE] < minimum_f_score:
-			minimum_f_score = dict_unvisited_neighbors[node][F_SCORE]
-			node_lowest_fscore = node
-
-	return node_lowest_fscore
 
 # Search function with A* algorithm implementation
 def a_star_search(graph, start_node, target_node):
 	# Create lists for visited and unvisited nodes
 	visited = {}
-	unvisited = {}
+	unvisited = {} # { Node: [c_score, f_score, previous_node] }
 
 	# Add and initialize every node to the unvisited list
 	for node in graph_map:
@@ -185,8 +175,11 @@ def a_star_search(graph, start_node, target_node):
 		if len(unvisited) == 0:
 			done = True
 		else:
-    		# Create a local dict to store unvisited neighbor nodes	
-			unvisited_neighbors = {} 
+    		# Create a local heap list
+			unvisited_heap = []
+			# Create a local dict to store 
+			# unvisited neighboring nodes
+			unvisited_neighbor_dict = {}
 			
     		# Check if current node is the target node
 			if current_node == target_node:
@@ -208,8 +201,11 @@ def a_star_search(graph, start_node, target_node):
 							unvisited[neighbor][C_SCORE] = new_c_score
 							unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
 							unvisited[neighbor][PREVIOUS] = current_node
-							# save all unvistied neighbors in this local dict copy
-							unvisited_neighbors[neighbor] = unvisited[neighbor] 
+							# save tuple, e.g. (fscore, node), in heap
+							#print('F: ', unvisited[neighbor][F_SCORE])
+							unvisited_neighbor_dict[id(neighbor)] = neighbor
+							heapq.heappush(unvisited_heap, (unvisited[neighbor][F_SCORE], id(neighbor)))
+							
 
     			# Add current node to the visited list
 				visited[current_node] = unvisited[current_node]
@@ -218,7 +214,10 @@ def a_star_search(graph, start_node, target_node):
 				del unvisited[current_node]
 
 				# Get the unvisited node with the lowest f score value
-				current_node = get_minimum(unvisited_neighbors) 
+				_, neighbor_id = heapq.heappop(unvisited_heap)
+
+				# update current node to be the next node to be explored
+				current_node = unvisited_neighbor_dict[neighbor_id]
 
     # TODO: return the final visited list
 	return visited
