@@ -1,6 +1,8 @@
 # import libraries
 import glob
+import math
 import sys
+
 from Node import Node
 
 # retrieve file name
@@ -95,3 +97,34 @@ for row in range(num_rows):
 # print the map using the saved list of lists
 for seq in guide_map:
 	print("".join(seq), end='')
+
+
+
+def heuristic_function_0(explorer, summit):
+	delta_x = explorer.get_x_pos() - summit.get_x_pos()
+	delta_y = explorer.get_y_pos() - summit.get_y_pos()
+	delta_z = explorer.get_x_pos() - summit.get_z_pos()
+
+	return math.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
+
+def heuristic_function_1(explorer, summit):
+	# Manhattan distance
+	delta_x = explorer.get_x_pos() - summit.get_x_pos()
+	delta_y = explorer.get_y_pos() - summit.get_y_pos()
+
+	return math.sqrt(delta_x**2 + delta_y**2) 
+
+def heuristic_function_2(explorer, summit):
+	pass
+
+def get_minimum(dict_unvisited_nodes):
+	minimum_f_score = sys.max_size
+
+	for node in dict_unvisited_nodes:
+		if dict_unvisited_nodes[node][F_SCORE] < minimum_f_score:
+			minimum_f_score = dict_unvisited_nodes[node][F_SCORE]
+
+	return minimum_f_score
+
+def a_star_search(graph, start_node, target_node):
+	pass
