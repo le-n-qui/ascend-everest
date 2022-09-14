@@ -147,7 +147,6 @@ def get_heuristic(current_node, target_node):
 
 	return h_score_value
 
-
 # Search function with A* algorithm implementation
 def a_star_search(graph, start_node, target_node):
 	# Create lists for visited and unvisited nodes
@@ -201,9 +200,13 @@ def a_star_search(graph, start_node, target_node):
 							unvisited[neighbor][C_SCORE] = new_c_score
 							unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
 							unvisited[neighbor][PREVIOUS] = current_node
-							# save tuple, e.g. (fscore, node), in heap
-							#print('F: ', unvisited[neighbor][F_SCORE])
+							
+							# restrict which neighbor nodes the explorer can get to
+							# by specifying the elevation difference to be 1
+						if abs(current_node.get_z_pos() - neighbor.get_z_pos()) <= 1:
+								# store node into this local dict with key as id(node)
 							unvisited_neighbor_dict[id(neighbor)] = neighbor
+								# save tuple, e.g. (fscore, id(node)), in heap
 							heapq.heappush(unvisited_heap, (unvisited[neighbor][F_SCORE], id(neighbor)))
 							
 
