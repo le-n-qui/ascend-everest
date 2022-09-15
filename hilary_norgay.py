@@ -13,8 +13,10 @@ test_file = sys.argv[1]
 # cast a text-based number into integer
 heuristic = int(sys.argv[2]) 
 
-# a mapping 
+# a mapping from character to number
 elevation = {'~': 0, '.': 1, ':': 2, 'M': 3, 'S': 4}
+# a mapping from number to character
+codes = {0: '~', 1: '.', 2: ':', 3: 'M', 4: 'S'}
 
 # counter for x position on the map
 x_counter = 0
@@ -98,11 +100,9 @@ for row in range(num_rows):
 	
 	
 def print_terrain_map():
-	pass
-
-# print the map using the saved list of lists
-# for seq in guide_map:
-# 	print("".join(seq), end='')
+	# print the guide map 
+	for seq in guide_map:
+		print("".join(seq), end='')
 
 # Indices for c cost, 
 # f cost, and previous node
@@ -150,8 +150,8 @@ def get_heuristic(current_node, target_node):
 # Search function with A* algorithm implementation
 def a_star_search(graph, start_node, target_node):
 	# Create lists for visited and unvisited nodes
-	visited = {}
-	unvisited = {} # { Node: [c_score, f_score, previous_node] }
+	visited = {} # Format -- { Node: [c_score, f_score, previous_node] }
+	unvisited = {} # Format -- { Node: [c_score, f_score, previous_node] }
 
 	# Add and initialize every node to the unvisited list
 	for node in graph_map:
@@ -168,6 +168,12 @@ def a_star_search(graph, start_node, target_node):
 
     # Loop until the unvisited list becomes empty
 	done = False
+	# counter for map printing
+	count = 0
+
+	print('M_' + str(count))
+	print_terrain_map()
+	print('\n')
 
 	while not done:
     	# Verify if there are nodes in unvisited list
@@ -201,18 +207,19 @@ def a_star_search(graph, start_node, target_node):
 							unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
 							unvisited[neighbor][PREVIOUS] = current_node
 							
-							# restrict which neighbor nodes the explorer can get to
-							# by specifying the elevation difference to be 1
+						# restrict which neighbor nodes the explorer can get to
+						# by specifying the elevation difference to be 1
 						if abs(current_node.get_z_pos() - neighbor.get_z_pos()) <= 1:
-								# store node into this local dict with key as id(node)
+							# store node into this local dict with key as id(node)
 							unvisited_neighbor_dict[id(neighbor)] = neighbor
-								# save tuple, e.g. (fscore, id(node)), in heap
+							# save tuple, e.g. (fscore, id(node)), in heap
 							heapq.heappush(unvisited_heap, (unvisited[neighbor][F_SCORE], id(neighbor)))
 							
 
     			# Add current node to the visited list
 				visited[current_node] = unvisited[current_node]
-
+				guide_map[current_node.get_x_pos()][current_node.get_y_pos()] = codes[current_node.get_z_pos()]
+				
     			# Remove current node from the unvisited list
 				del unvisited[current_node]
 
@@ -221,15 +228,19 @@ def a_star_search(graph, start_node, target_node):
 
 				# update current node to be the next node to be explored
 				current_node = unvisited_neighbor_dict[neighbor_id]
-
-    # TODO: return the final visited list
+				guide_map[current_node.get_x_pos()][current_node.get_y_pos()] = str(current_node.get_z_pos())
+				
+				count += 1
+				print('M_' + str(count))
+				print_terrain_map()
+				print('\n')
+    # Return the final visited list
 	return visited
 
 
 # Test
 result_map = a_star_search(graph_map, explorer_node, summit_node)
-for node in result_map:
-	node.print_node_info()
+
     
 
    
