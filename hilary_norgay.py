@@ -110,6 +110,69 @@ def print_terrain_map():
 	for seq in guide_map:
 		print("".join(seq), end='')
 
+# Function to trace from summit node
+# to explorer node, and invoke
+# map print function to generate
+# the equence of maps
+def trace_and_print(visited_nodes, explorer, summit):
+	# Save the path of nodes 
+	# into a stack
+	stack = []
+	# start the trace at summit node
+	curr_node = summit
+	# flag to stop loop
+	finished = False
+
+	while not finished:
+		# examine previous node of current node
+		previous_node = visited_nodes[curr_node][PREVIOUS]
+		# is previous node the same as explorer node
+		if previous_node == explorer:
+			# push current node into stack first
+			stack.append(curr_node)
+			# then push previous node (explorer node) into stack
+			stack.append(previous_node)
+			# done with tracing
+			finished = True
+		else:
+			# if previous node not the explorer node
+			stack.append(curr_node)
+			# go to that previous node
+			curr_node = previous_node
+
+	
+	print('MAP PRINTING')
+	print('------------')
+	# pop the first node off the stack
+	node = stack.pop() # explorer
+	# start counter for map printing
+	count = 0
+	# print out the first map
+	print('M_' + str(count))
+	print_terrain_map()
+	print('\n')
+
+	# print subsequent maps
+	while len(stack) != 0:
+		# sleep for 2 seconds
+		time.sleep(2)
+		# clear command line screen 
+		# for new map
+		clear()
+		# change popped node's elevation number into landscape symbol
+		guide_map[node.get_x_pos()][node.get_y_pos()] = codes[node.get_z_pos()]
+		# increment counter
+		count += 1
+		# examine next node in stack
+		node = stack.pop()
+		# change landscape symbol into elevation number 
+		# i.e. explorer is now at this node
+		guide_map[node.get_x_pos()][node.get_y_pos()] = str(node.get_z_pos())
+		# print out the next map
+		print('M_' + str(count))
+		print_terrain_map()
+		print('\n')
+
 # Euclidean heuristic function
 def heuristic_function_0(explorer, summit):
 	delta_x = explorer.get_x_pos() - summit.get_x_pos()
@@ -237,56 +300,16 @@ def a_star_search(graph, start_node, target_node):
 
 				# update current node to be the next node to be explored
 				current_node = unvisited_neighbor_dict[neighbor_id]
-				
 	
-	# Save the path of nodes 
-	# into a stack
-	stack = []
-	curr_node = summit_node
-	finished = False
-
-	while not finished:
-		
-		previous_node = visited[curr_node][PREVIOUS]
-		if previous_node == explorer_node:
-			
-			stack.append(curr_node)
-			stack.append(previous_node)
-			finished = True
-		else:
-			
-			stack.append(curr_node)
-			curr_node = previous_node
-
-	
-	print("MAP PRINTING")
-	print("------------")
-	# pop the first node off the stack
-	node = stack.pop() # explorer
-	# start counter for map printing
-	count = 0
-	# print out the first map
-	print('M_' + str(count))
-	print_terrain_map()
-	print('\n')
-
-	# print subsequent maps
-	while len(stack) != 0:
-		time.sleep(2)
-		clear()
-		guide_map[node.get_x_pos()][node.get_y_pos()] = codes[node.get_z_pos()]
-		count += 1
-		node = stack.pop()
-		guide_map[node.get_x_pos()][node.get_y_pos()] = str(node.get_z_pos())
-		print('M_' + str(count))
-		print_terrain_map()
-		print('\n')
+	# trace the path from summit node to explorer node
+	# and start printing maps from the explorer node				
+	trace_and_print(visited, explorer_node, summit_node)
 
     # Return the final visited list
 	return visited
 
 
-# Test
+# Test A* search function
 result_map = a_star_search(graph_map, explorer_node, summit_node)
 
     
