@@ -104,12 +104,6 @@ def print_terrain_map():
 	for seq in guide_map:
 		print("".join(seq), end='')
 
-# Indices for c cost, 
-# f cost, and previous node
-C_SCORE = 0
-F_SCORE = 1
-PREVIOUS = 2
-
 # Euclidean heuristic function
 def heuristic_function_0(explorer, summit):
 	delta_x = explorer.get_x_pos() - summit.get_x_pos()
@@ -151,6 +145,12 @@ def get_heuristic(current_node, target_node):
 
 	return h_score_value
 
+# Indices for c cost, 
+# f cost, and previous node
+C_SCORE = 0
+F_SCORE = 1
+PREVIOUS = 2
+
 # Search function with A* algorithm implementation
 def a_star_search(graph, start_node, target_node):
 	# Create lists for visited and unvisited nodes
@@ -191,23 +191,27 @@ def a_star_search(graph, start_node, target_node):
 			else:
     			# Get the list of current node's neighbors
 				neighbors = graph_map[current_node]
-
+				
     			# Loop through each node in neighbors list
 				for neighbor in neighbors:
+
     				# Check if the neighbor node has already been visited
 					if neighbor not in visited:
-    					# Calculate new c score
-						new_c_score = unvisited[current_node][C_SCORE] + 1
 
-						if new_c_score < unvisited[neighbor][C_SCORE]:
-    						# Update c, f, and previous node for neighbor
-							unvisited[neighbor][C_SCORE] = new_c_score
-							unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
-							unvisited[neighbor][PREVIOUS] = current_node
-							
 						# restrict which neighbor nodes the explorer can get to
 						# by specifying the elevation difference to be 1
 						if abs(current_node.get_z_pos() - neighbor.get_z_pos()) <= 1:
+							
+    						# Calculate new c score
+							new_c_score = unvisited[current_node][C_SCORE] + 1
+
+							if new_c_score < unvisited[neighbor][C_SCORE]:
+								
+    							# Update c, f, and previous node for neighbor
+								unvisited[neighbor][C_SCORE] = new_c_score
+								unvisited[neighbor][F_SCORE] = new_c_score + get_heuristic(neighbor, target_node)
+								unvisited[neighbor][PREVIOUS] = current_node
+						
 							# store node into this local dict with key as id(node)
 							unvisited_neighbor_dict[id(neighbor)] = neighbor
 							# save tuple, e.g. (fscore, id(node)), in heap
@@ -229,6 +233,10 @@ def a_star_search(graph, start_node, target_node):
 				current_node = unvisited_neighbor_dict[neighbor_id]
 				
 	
+	print("\n")			
+	print("TRACING BACK FROM SUMMIT")
+	print("-------------------------")
+
 	# Save the path of nodes 
 	# into a stack
 	stack = []
@@ -236,15 +244,23 @@ def a_star_search(graph, start_node, target_node):
 	finished = False
 
 	while not finished:
+		print("Current Node: ")
+		curr_node.print_node_info()
 		
 		previous_node = visited[curr_node][PREVIOUS]
 		if previous_node == explorer_node:
+			previous_node.print_node_info()
+			stack.append(curr_node)
 			stack.append(previous_node)
 			finished = True
 		else:
+			curr_node.print_node_info()
 			stack.append(curr_node)
 			curr_node = previous_node
 
+	print("\n")
+	print("MAP PRINTING")
+	print("------------")
 	# pop the first node off the stack
 	node = stack.pop() # explorer
 	# start counter for map printing
