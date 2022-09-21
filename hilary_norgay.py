@@ -3,8 +3,14 @@ import glob
 import heapq
 import math
 import sys
+import time
 
+from os import system
 from Node import Node
+
+# create clear function
+# to refresh command line output
+clear = lambda: system('clear')
 
 # retrieve file name
 test_file = sys.argv[1]
@@ -233,10 +239,6 @@ def a_star_search(graph, start_node, target_node):
 				current_node = unvisited_neighbor_dict[neighbor_id]
 				
 	
-	print("\n")			
-	print("TRACING BACK FROM SUMMIT")
-	print("-------------------------")
-
 	# Save the path of nodes 
 	# into a stack
 	stack = []
@@ -244,21 +246,19 @@ def a_star_search(graph, start_node, target_node):
 	finished = False
 
 	while not finished:
-		print("Current Node: ")
-		curr_node.print_node_info()
 		
 		previous_node = visited[curr_node][PREVIOUS]
 		if previous_node == explorer_node:
-			previous_node.print_node_info()
+			
 			stack.append(curr_node)
 			stack.append(previous_node)
 			finished = True
 		else:
-			curr_node.print_node_info()
+			
 			stack.append(curr_node)
 			curr_node = previous_node
 
-	print("\n")
+	
 	print("MAP PRINTING")
 	print("------------")
 	# pop the first node off the stack
@@ -272,6 +272,8 @@ def a_star_search(graph, start_node, target_node):
 
 	# print subsequent maps
 	while len(stack) != 0:
+		time.sleep(2)
+		clear()
 		guide_map[node.get_x_pos()][node.get_y_pos()] = codes[node.get_z_pos()]
 		count += 1
 		node = stack.pop()
