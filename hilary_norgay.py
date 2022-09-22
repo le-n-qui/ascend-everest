@@ -48,23 +48,33 @@ with open(test_file) as file:
 
  		# look at one line char by char
  		for char in line:
+ 			# each character will be saved as is in sequence
  			sequence.append(char)
+ 			# if we encounter end of line
  			if char == '\n': 
+ 				# restart y counter
  				y_counter = 0
  				break
+ 			# if we see a number character
  			elif char.isnumeric():
+ 				# save the explorer's position and elevation
  				explorer_node = Node(x_counter, y_counter, int(char))
  				node_list.append(explorer_node)
+ 			# if we see the 'S' character
  			elif char == 'S':
+ 				# save the summit's position and elevation
  				summit_node = Node(x_counter, y_counter, elevation[char])
  				node_list.append(summit_node)
-
+ 			# otherwise, save each square's position and elevation
  			else:
  				node_list.append(Node(x_counter, y_counter, elevation[char]))
+ 			# increment y counter to follow squares from left to right
  			y_counter += 1
-
+ 		# save each character sequence into guide map
  		guide_map.append(sequence)
+ 		# save the corresponding node list into sequence list
  		seq_list.append(node_list)
+ 		# increment x counter to go on to the next row of the map grid
  		x_counter += 1
 
 
@@ -113,7 +123,7 @@ def print_terrain_map():
 # Function to trace from summit node
 # to explorer node, and invoke
 # map print function to generate
-# the equence of maps
+# the sequence of maps
 def trace_and_print(visited_nodes, explorer, summit):
 	# Save the path of nodes 
 	# into a stack
@@ -311,8 +321,3 @@ def a_star_search(graph, start_node, target_node):
 
 # Test A* search function
 result_map = a_star_search(graph_map, explorer_node, summit_node)
-
-    
-
-   
-	
